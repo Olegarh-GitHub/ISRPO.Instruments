@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Инструменты</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<style>
+    .trash-icon:hover {
+        fill: #761e1f;
+        cursor: pointer;
+    }
+    .paperclip-icon:hover {
+        fill: #6c6e6e;
+        cursor: pointer;
+    }
+</style>
+<body>
+    <div id="instruments" class="card" style="padding: 2.5em">
+        <div style="font-weight: bold; font-size: 24px" class="card-header">Магазин музыкальных инструментов на Фучика 9А</div>
+        <div id="instruments-insert">
+            
+        </div>
+        <button id="instrument-create-button" style="width: 36em;" type="button" class="btn btn-primary" onclick="addInstrument()" >Добавить</button>
+    </div>
+</body>
+</html>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+    function loadDocument() {
+        $.ajax({
+            type: "GET",
+            url: "/Instruments/read",
+            success: function(data) {
+                let instruments = data;
+
+                for (let i = 0; i < instruments.length; i++){
+                    let id = instruments[i].id;
+                    let name = instruments[i].name;
+                    let description = instruments[i].description;
+                    let cost = instruments[i].cost;
+
+                    let html =
+                        `<div id='instrument-${id}' class="card" style="margin-bottom: 2.5em; margin-top: 2.5em; width: 36em; position: relative" name="${name}" description="${description}" cost="${cost}">
+                            <div class="card-body" id="instrument-${id}-body">
+                                <div id="instrument-${id}-name" style="font-weight: bold">
+                                    ${name}
+                                </div>
+                                <div id="instrument-${id}-description">
+                                    ${description}
+                                </div>
+                                <hr id="instrument-${id}-hr">
+                                <div id="instrument-${id}-cost">
+                                   ${cost} руб.
+                                </div>
+                            <button id="instrument-${id}-edit-button" style="margin-top: 1em" type="button" class="btn btn-primary" onclick="editInstrument(${id})">Изменить</button>
+                            <svg style="position: absolute; top:0.5em; right: 1.5em" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A3ACAE" class="bi bi-paperclip paperclip-icon" viewBox="0 0 16 16" onclick="showImage(${id})">
+                              <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                            </svg>
+                            <svg style="position: absolute; top:0.5em; right: 0.5em" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-trash trash-icon" viewBox="0 0 16 16" onclick="deleteInstrument(${id})">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                            </div>
+                        </div>`;
+
+                    $("#instruments-insert").append(html);
+                }
+            },
+            error: function() {
+                alert('Инструменты не загружены');
+            }
+        });
+    }
+    
+    function editInstrument(id) {
+        let instrumentId = `#instrument-${id}`;
+        let instrument = $(instrumentId);
+        
+        $(instrumentId + "-name").hide();
+        $(instrumentId + "-description").hide();
+        $(instrumentId + "-cost").hide();
+        $(instrumentId + "-edit-button").hide();
+        $(instrumentId + "-hr").hide();
+        
+        let name = instrument.attr("name");
+        let description = instrument.attr("description");
+        let cost = instrument.attr("cost");
+        
+        let nameInput = `<input id="instrument-${id}-name-input" type="text" value="${name}" class="for-edit" style="display: block; margin-top: 0.5em"/>`;
+        let descriptionInput = `<input id="instrument-${id}-description-input" value="${description}" type="text" class="for-edit" style="display: block; margin-top: 0.5em"/>`;
+        let costInput = `<input id="instrument-${id}-cost-input" type="text" value="${cost}" class="for-edit" style="display: block; margin-top: 0.5em"/>`;
+        
+        let submitButton = `<button id="instrument-${id}-submit-button" type="button" style="display: block; margin-top: 0.25em" class="btn btn-success for-edit" onclick="editInstrumentTotally(${id})">Изменить</button>`;
+        let cancelButton = `<button id="instrument-${id}-cancel-button" type="button" style="display: block; margin-top: 0.5em" class="btn btn-danger for-edit" onclick="reloadInstrument(${id})">Отмена</button>`;
+        
+        instrument.children().append(nameInput);
+        instrument.children().append(descriptionInput);
+        instrument.children().append(costInput);
+        instrument.children().append(cancelButton);
+        instrument.children().append(submitButton);
+    }
+
+    function reloadInstrument(id) {
+        let instrumentId = `#instrument-${id}`;
+        let instrument = $(instrumentId);
+
+        $(`#instrument-${id}-name-input`).remove();
+        $(`#instrument-${id}-description-input`).remove();
+        $(`#instrument-${id}-cost-input`).remove();
+        $(`#instrument-${id}-submit-button`).remove();
+        $(`#instrument-${id}-cancel-button`).remove();
+        
+        $(instrumentId + "-name").show();
+        $(instrumentId + "-description").show();
+        $(instrumentId + "-cost").show();
+        $(instrumentId + "-edit-button").show();
+        $(instrumentId + "-hr").show();
+    }
+
+    function reloadInstrumentValues(id, data) {
+        let instrumentId = `#instrument-${id}`;
+        let instrument = $(instrumentId);
+
+        $(instrumentId + "-name").text(data.name);
+        $(instrumentId + "-description").text(data.description);
+        $(instrumentId + "-cost").text(data.cost + " руб.");
+    }
+    
+    function editInstrumentTotally(id) {
+        let instrumentId = `#instrument-${id}`;
+        let nameFromInput = $(instrumentId + "-name-input").val();
+        let descriptionFromInput = $(instrumentId + "-description-input").val();
+        let costFromInput = $(instrumentId + "-cost-input").val();
+        
+        $.ajax({
+            type: "PUT",
+            url: "/Instruments/update",
+            data: {
+                id: id,
+                name: nameFromInput,
+                description: descriptionFromInput,
+                cost: costFromInput
+            },
+            success: function (data) {
+                reloadInstrument(id);
+                reloadInstrumentValues(id, data);
+            },
+            error: function () {
+                reloadInstrument(id);
+                alert("Не удалось изменить инструмент");
+            }
+        });
+    }
+    
+    function addInstrument() {
+        $("#instrument-create-button").attr("disabled", true);
+        
+        let html =
+            `<div id='instrument-temp' class="card" style="margin-top: 2.5em; margin-bottom: 2.5em; width: 36em; position: relative">
+                <div class="card-body" id="instrument-temp-body">
+                    <span style="display: block; margin-top: 0.5em">Название</span>
+                    <input id="instrument-temp-name-input" type="text" class="for-edit" style="display: block; margin-top: 0.5em"/>
+                    <span style="display: block; margin-top: 0.5em">Описание</span>
+                    <input id="instrument-temp-description-input" type="text" class="for-edit" style="display: block; margin-top: 0.5em"/>
+                    <span style="display: block; margin-top: 0.5em">Стоимость</span>
+                    <input id="instrument-temp-cost-input" type="text" class="for-edit" style="display: block; margin-top: 0.5em"/>
+                    <span style="display: block; margin-top: 0.5em">Изображение</span>                  
+                    <input class="form-control form-control-sm" style="padding: 0.25em" type="file" id="instrument-temp-file-input">
+                <button id="instrument-temp-cancel-button" style="margin-top: 1em" type="button" class="btn btn-danger" onclick="deleteInstrumentTemp()">Отмена</button>               
+                <button id="instrument-temp-add-button" style="margin-top: 1em" type="button" class="btn btn-primary" onclick="addInstrumentTotally()">Добавить</button>               
+                </div>
+            </div>`;
+
+        $("#instruments-insert").append(html);
+    }
+    
+    async function addInstrumentTotally() {
+        deleteInstrumentTemp();
+
+        let nameFromInput = $("#instrument-temp-name-input").val();
+        let descriptionFromInput = $("#instrument-temp-description-input").val();
+        let costFromInput = $("#instrument-temp-cost-input").val();
+        
+        let files = document.getElementById('instrument-temp-file-input').files;
+        let reader = new FileReader();
+        
+        if (files.length > 0) {
+
+            reader.onload = async (event) => {
+                let imageBase64 = event.target.result;
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/Instruments/create",
+                    data: {
+                        name: nameFromInput,
+                        description: descriptionFromInput,
+                        cost: costFromInput,
+                        image: imageBase64
+                    },
+                    success: function (data) {
+                        let id = data.id;
+                        let name = data.name;
+                        let description = data.description;
+                        let cost = data.cost;
+
+                        let html =
+                            `<div id='instrument-${id}' class="card" style="margin-bottom: 2.5em; margin-top: 2.5em; width: 36em; position: relative" name="${name}" description="${description}" cost="${cost}">
+                            <div class="card-body" id="instrument-${id}-body">
+                                <div id="instrument-${id}-name" style="font-weight: bold">
+                                    ${name}
+                                </div>
+                                <div id="instrument-${id}-description">
+                                    ${description}
+                                </div>
+                                <hr id="instrument-${id}-hr">
+                                <div id="instrument-${id}-cost">
+                                   ${cost} руб.
+                                </div>
+                            <button id="instrument-${id}-edit-button" style="margin-top: 1em" type="button" class="btn btn-primary" onclick="editInstrument(${id})">Изменить</button>
+                            <svg style="position: absolute; top:0.5em; right: 1.5em" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A3ACAE" class="bi bi-paperclip paperclip-icon" viewBox="0 0 16 16" onclick="showImage(${id})">
+                              <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                            </svg>
+                            <svg style="position: absolute; top:0.5em; right: 0.5em" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-trash trash-icon" viewBox="0 0 16 16" onclick="deleteInstrument(${id})">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                            </div>
+                        </div>`;
+
+                        $("#instruments-insert").append(html);
+                    },
+                    error: function (error) {
+                        alert(error);
+                    }
+                });
+            }
+            reader.readAsDataURL(files[0]);
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/Instruments/create",
+                data: {
+                    name: nameFromInput,
+                    description: descriptionFromInput,
+                    cost: costFromInput
+                },
+                success: function (data) {
+                    let id = data.id;
+                    let name = data.name;
+                    let description = data.description;
+                    let cost = data.cost;
+
+                    let html =
+                        `<div id='instrument-${id}' class="card" style="margin-bottom: 2.5em; width: 36em; position: relative" name="${name}" description="${description}" cost="${cost}">
+                            <div class="card-body" id="instrument-${id}-body">
+                                <div id="instrument-${id}-name" style="font-weight: bold">
+                                    ${name}
+                                </div>
+                                <div id="instrument-${id}-description">
+                                    ${description}
+                                </div>
+                                <hr id="instrument-${id}-hr">
+                                <div id="instrument-${id}-cost">
+                                   ${cost} руб.
+                                </div>
+                            <button id="instrument-${id}-edit-button" style="margin-top: 1em" type="button" class="btn btn-primary" onclick="editInstrument(${id})">Изменить</button>
+                            <svg style="position: absolute; top:0.5em; right: 1.5em" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#A3ACAE" class="bi bi-paperclip paperclip-icon" viewBox="0 0 16 16" onclick="showImage(${id})">
+                              <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                            </svg>
+                            <svg style="position: absolute; top:0.5em; right: 0.5em" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-trash trash-icon" viewBox="0 0 16 16" onclick="deleteInstrument(${id})">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                            </div>
+                        </div>`;
+
+                    $("#instruments-insert").append(html);
+                },
+                error: function (error) {
+                    alert(error);
+                }
+            });
+        }
+    }
+    
+    function deleteInstrument(id) {
+        let instrument = $(`#instrument-${id}`);
+
+        $.ajax({
+            type: "DELETE",
+            url: `/Instruments/delete`,
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data.result)
+                    instrument.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+            },
+            error: function () {
+                alert(`Не удалось удалить инструмент с наименованием "${instrument.attr("name")}"`);
+            }
+        });
+    }
+    
+    function deleteInstrumentTemp() {
+        $("#instrument-create-button").attr("disabled", false);
+        
+        $("#instrument-temp").fadeOut(300, function() {
+            $(this).remove();
+        });
+    }
+    
+    function showImage(id) {
+        let instrument = $(`#instrument-${id}`);
+        
+        $.ajax({
+            type: "GET",
+            url: `Instruments/image/${id}`,
+            data: {
+                id: id
+            },
+            success: function (data) {
+                let image = data.image;
+                let imageHtml = `<img alt="Инструмент" src="${image}" width="256" height="256" style="box-shadow: rgba(28,30,30,0.23) 0 2px 10px 5px"/>`;
+                
+                let modal = `<div class="modal fade" id="instrument-${id}-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Изображение</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    ${imageHtml}
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>`
+                
+                $("#instruments").append(modal);
+                $(`#instrument-${id}-modal`).modal('show');
+            }
+        });
+    }
+
+    const fileToBase64 = async (file) =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = () => resolve(reader.result)
+            reader.onerror = (e) => reject(e)
+        })
+
+    $(document).ready(function() {
+        loadDocument();
+    });
+</script>

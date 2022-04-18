@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISRPO.Fourth", "ISRPO.Fourth\ISRPO.Fourth.csproj", "{36ED2A2F-5ACA-41EE-B68F-5B50907E4CDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISRPO.Fourth.Domain", "ISRPO.Fourth.Domain\ISRPO.Fourth.Domain.csproj", "{8E4C7588-587A-421A-9476-AB583F8046AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISRPO.Fourth.Infrastructure", "ISRPO.Fourth.Infrastructure\ISRPO.Fourth.Infrastructure.csproj", "{F69A0A62-EE93-4A4E-A57C-9BE1AE000D41}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36ED2A2F-5ACA-41EE-B68F-5B50907E4CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36ED2A2F-5ACA-41EE-B68F-5B50907E4CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36ED2A2F-5ACA-41EE-B68F-5B50907E4CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36ED2A2F-5ACA-41EE-B68F-5B50907E4CDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E4C7588-587A-421A-9476-AB583F8046AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E4C7588-587A-421A-9476-AB583F8046AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E4C7588-587A-421A-9476-AB583F8046AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E4C7588-587A-421A-9476-AB583F8046AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F69A0A62-EE93-4A4E-A57C-9BE1AE000D41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F69A0A62-EE93-4A4E-A57C-9BE1AE000D41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F69A0A62-EE93-4A4E-A57C-9BE1AE000D41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F69A0A62-EE93-4A4E-A57C-9BE1AE000D41}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
